@@ -1,0 +1,8 @@
+Package: predixcantools
+Version: 0.99.0
+Date: 2016-12-28
+Title: predixcantools
+Description: helper functions to predixcan and metaxcan softwares
+Author: Veera Manikandan Rajagopal<veera.ipsych@gmail.com>
+Maintainer: Veera Manikandan Rajagopal<veera.ipsych@gmail.com>
+RoxygenNote: 5.0.1
