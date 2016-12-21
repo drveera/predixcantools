@@ -17,6 +17,6 @@ extract_weights <- function(db){
     }
     dbweights <- do.call(rbind,dblist)
     ##remove duplicates
-    dbweights <- dbweights[!duplicated(rsid)]
+    dbweights <- dbweights[!duplicated(dbweights$rsid),]
     return(dbweights)
 }
