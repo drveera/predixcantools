@@ -4,6 +4,8 @@
 #'
 #' @param db a chracter vector of db filenames with absolute path to read
 #'
+#' @importFrom RSQLite dbConnect dbReadTable dbDriver dbDisconnect
+#' 
 #' @export
 extract_weights <- function(db){
     dblist <- list()

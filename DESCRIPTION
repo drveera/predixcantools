@@ -9,5 +9,5 @@ RoxygenNote: 5.0.1
 Depends:
 	R (>= 3.1.0)
 Imports:
-	data.table(>= 1.10.0),
-	RSQLite(>= 1.1.0)
+	data.table,
+	RSQLite

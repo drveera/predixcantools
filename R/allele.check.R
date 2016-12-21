@@ -8,6 +8,8 @@
 #' @param effect.allele.col effect allele column in summary
 #' @param alt.allele.col alternative allele column in summary
 #' @param beta.col beta column in summary; if you have odds ration, change it beta by log(odds ratio)
+#'
+#' @import data.table
 #' 
 #' @export
 allele.check <- function(summary,
@@ -17,34 +19,37 @@ allele.check <- function(summary,
                          alt.allele.col="a2",
                          beta.col = "beta"){
 
-
     ##subset summary file
+
     summary <- data.table(summary)
     if(!snp.col == 'rsid'){
         summary$rsid <- summary[,snp.col,with=FALSE]
     }
+
     if(! effect.allele.col == 'a1'){
         summary$a1 <- summary[,effect.allele.col,with=FALSE]
     }
+
     if(! alt.allele.col == 'a2'){
         summary$a2 <- summary[,alt.allele.col,with=FALSE]
     }
+
     if(! beta.col == 'beta'){
         summary$beta <- summary[,beta.col,with=FALSE]
     }
 
     ##remove duplicated in summary
-    summary <- summary[!duplicated(rsid)]
-    
+    summary <- summary[!duplicated(summary$rsid),]
+
     dfm <- merge(summary,dbweights, by= "rsid")
-    dfm <- data.table(dfm)
+    dfm <<- data.table(dfm)
 
     ## seperate variants with strand flips
-    dfm.flip <- dfm[!(ref_allelle == a2 | ref_allele == a1)]
-    dfm.noflip <- dfm[(ref_allelle == a2 | ref_allele == a1)]
+    dfm.flip <- dfm[!(dfm$ref_allele == a2 | dfm$ref_allele == a1)]
+    dfm.noflip <- dfm[(dfm$ref_allele == a2 | dfm$ref_allele == a1)]
     ##flip the strand
-    dfm.flip$a1 <- flipstrand(dfm.flip$a1)
-    dfm.flip$a2 <- flipstrand(dfm.flip$a2)
+    dfm.flip$a1 <- sapply(dfm.flip$a1,flipstrand)
+    dfm.flip$a2 <- sapply(dfm.flip$a2,flipstrand)
     ##take only those flipped and drop others
     dfm.flip <- dfm.flip[(ref_allele == a2 | ref_allele == a1) & (eff_allele == a2 | eff_allele == a1)]
     ##merge back
@@ -54,14 +59,14 @@ allele.check <- function(summary,
     dfm$amatch <- ifelse(dfm$amatch,"match","nomatch")
     ##split
     dfm.split <- split(dfm,dfm$amatch)
-    match <- dfm.split$match
-    nomatch <- dfm.split$nomatch
-    nomatch$beta <- nomatch$beta * -1
-    a1 <- nomatch$a2
-    a2 <- nomatch$a1
-    nomatch$a1 <- a1
-    nomatch$a2 <- a2
+    matchdfm <- dfm.split$match
+    nomatchdfm <- dfm.split$nomatch
+    nomatchdfm$beta <- nomatchdfm$beta * -1
+    a1 <- nomatchdfm$a2
+    a2 <- nomatchdfm$a1
+    nomatchdfm$a1 <- a1
+    nomatchdfm$a2 <- a2
     ##combine back
-    dfm <- rbind(match,nomatch)
+    dfm <- rbind(matchdfm,nomatchdfm)
     return(dfm)
 }
