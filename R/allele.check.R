@@ -3,7 +3,7 @@
 #' allele.check
 #'
 #' @param summary summary data frame
-#' @param db a single or a vector of dbfile names(with full absolute path) as character vector
+#' @param dbweights db weights produced by function extract_weights
 #' @param snp.col snp column in summary
 #' @param effect.allele.col effect allele column in summary
 #' @param alt.allele.col alternative allele column in summary
@@ -11,23 +11,12 @@
 #' 
 #' @export
 allele.check <- function(summary,
-                         db,
+                         dbweights,
                          snp.col="rsid",
                          effect.allele.col="a1",
                          alt.allele.col="a2",
                          beta.col = "beta"){
-    dblist <- list()
-    for(i in 1:length(db)){
-        ##create a connection
-        dbcon <- dbConnect(dbDriver("SQLite"), dbname=db[i])
-        ##read the weights
-        weights <- dbReadTable(dbcon,"weights")
-        dblist[[i]] <- data.table(weights)
-        dbDisconnect(dbcon)
-    }
-    dbweights <- do.call(rbind,dblist)
-    ##remove duplicates
-    dbweights <- dbweights[!duplicated(rsid)]
+
 
     ##subset summary file
     summary <- data.table(summary)

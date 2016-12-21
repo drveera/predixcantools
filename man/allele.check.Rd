@@ -4,13 +4,13 @@
 \alias{allele.check}
 \title{allele.check}
 \usage{
-allele.check(summary, db, snp.col = "rsid", effect.allele.col = "a1",
+allele.check(summary, dbweights, snp.col = "rsid", effect.allele.col = "a1",
   alt.allele.col = "a2", beta.col = "beta")
 }
 \arguments{
 \item{summary}{summary data frame}
 
-\item{db}{a single or a vector of dbfile names(with full absolute path) as character vector}
+\item{dbweights}{db weights produced by function extract_weights}
 
 \item{snp.col}{snp column in summary}
 
