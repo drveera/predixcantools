@@ -21,6 +21,7 @@ allele.check <- function(summary,
 
     ##subset summary file
 
+    cat("preprocessing summary file:")
     summary <- data.table(summary)
     if(!snp.col == 'rsid'){
         summary$rsid <- summary[,snp.col,with=FALSE]
@@ -40,10 +41,12 @@ allele.check <- function(summary,
 
     ##remove duplicated in summary
     summary <- summary[!duplicated(summary$rsid),]
-
+    cat("ok \n")
+    cat("subsetting only the SNPs in weight:")
     dfm <- merge(summary,dbweights, by= "rsid")
     dfm <<- data.table(dfm)
-
+    cat("ok \n")
+    cat("processing for possible strand flips:")
     ## seperate variants with strand flips
     dfm.flip <- dfm[!(dfm$ref_allele == a2 | dfm$ref_allele == a1)]
     dfm.noflip <- dfm[(dfm$ref_allele == a2 | dfm$ref_allele == a1)]
@@ -54,6 +57,8 @@ allele.check <- function(summary,
     dfm.flip <- dfm.flip[(ref_allele == a2 | ref_allele == a1) & (eff_allele == a2 | eff_allele == a1)]
     ##merge back
     dfm <- rbind(dfm.flip,dfm.noflip)
+    cat("ok \n")
+    cat("matching the reference and alt alleles with weights:")
     ##split the dfm with respect to allele match
     dfm$amatch <- with(dfm, a1 == eff_allele & a2 == ref_allele)
     dfm$amatch <- ifelse(dfm$amatch,"match","nomatch")
@@ -66,7 +71,9 @@ allele.check <- function(summary,
     a2 <- nomatchdfm$a1
     nomatchdfm$a1 <- a1
     nomatchdfm$a2 <- a2
+    cat("ok \n")
     ##combine back
     dfm <- rbind(matchdfm,nomatchdfm)
+    cat("done \n")
     return(dfm)
 }
